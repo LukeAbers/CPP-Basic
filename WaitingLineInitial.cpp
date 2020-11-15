@@ -61,7 +61,7 @@ bool compareTransaction(Transaction t1, Transaction t2)
     if (t1.lNameTransaction == t2.lNameTransaction){
         if (t1.fNameTransaction == t2.fNameTransaction){
             if (t1.amountTransaction < t2.amountTransaction){
-                return (t1.timeTransInt < t2.timeTransInt); 
+                return (t1.timeTransInt > t2.timeTransInt); 
             }
             return (t1.amountTransaction > t2.amountTransaction) ;
         }
