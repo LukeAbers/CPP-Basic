@@ -13,18 +13,18 @@ string calcTime(int);
 class Customer
 {
 public:
-  string fName, lName;
+  string firstName, lastName;
   int arrivalTime;
   Customer (string, string, int);
 };
 
-Customer::Customer (string fName, string lName, int arrivalTime)
+Customer::Customer (string firstName, string lastName, int arrivalTime)
 {
-  this->fName = fName;
-  this->lName = lName;
+  this->firstName = firstName;
+  this->lastName = lastName;
   this->arrivalTime = arrivalTime;
 
-  cout << "Customer " << this->fName << " " << this->lName << " was added at " << calcTime(this->arrivalTime) << "\n";
+  cout << "Customer " << this->firstName << " " << this->lastName << " was added at " << calcTime(this->arrivalTime) << "\n";
 }
 
 class Teller
@@ -60,8 +60,8 @@ bool compareTransaction(Transaction t1, Transaction t2)
 { 
     if (t1.lNameTransaction == t2.lNameTransaction){
         if (t1.fNameTransaction == t2.fNameTransaction){
-            if (t1.amountTransaction < t2.amountTransaction){
-                return (t1.timeTransInt > t2.timeTransInt); 
+            if (t1.amountTransaction <= t2.amountTransaction){
+                return (t1.timeTransInt < t2.timeTransInt); 
             }
             return (t1.amountTransaction > t2.amountTransaction) ;
         }
@@ -94,9 +94,7 @@ class Bank
       stack <int> waitingListLength;
       stack <int> waitingListTime;
       int timeMarker;
-      
-      void createReport();
-
+      int tellerInterval;
 };
 
 //Report Function List
@@ -135,11 +133,9 @@ int main ()
   b.mainTellerStack.push_back(t2);
   b.mainTellerStack.push_back(t3);
   
-  //Add first teller to working stacking
-  //t1.working = true;
-  //b.workingTellerStack.push(t1);
-  //cout << "Teller " << b.workingTellerStack.top().name << " was added\n\n";
-  
+  //Set Teller tellerInterval
+  b.tellerInterval = 3;
+
   //Variable to determine if new customer has arrived
   int newCustomer = 0;
   int randInt = 0;
@@ -184,12 +180,10 @@ int main ()
 	}
 	
 	//Free up tellers 
-	for(int j = 0; j < 3; j++) {
+	for(int j = 0; j < b.mainTellerStack.size(); j++) {
         if(b.mainTellerStack[j].freeTime == i){
             b.mainTellerStack[j].busy = false;
             cout << "Teller " << b.mainTellerStack[j].name << " has finished transaction\n";
-            
-            break;
         }
     }
 	
@@ -197,7 +191,7 @@ int main ()
 	if((b.customersWaiting.size() > 0 && b.workingTellerStack.size() < 1) || (b.customersWaiting.size() > 3 && b.workingTellerStack.size() < 2) || (b.customersWaiting.size() > 7 && b.workingTellerStack.size() < 3)){
 	     
 	    //Check for first non-working teller
-        for(int j = 0; j < 3; j++) {
+        for(int j = 0; j < b.mainTellerStack.size(); j++) {
             if(!b.mainTellerStack[j].working){
                 b.mainTellerStack[j].working = true;
                 b.workingTellerStack.push(b.mainTellerStack[j]);
@@ -212,11 +206,8 @@ int main ()
         if(!b.workingTellerStack.top().busy){
             b.workingTellerStack.top().working = false;
             
-            //Leave at least one teller
-            //if(b.workingTellerStack.size() != 1){
             cout << "Teller " << b.workingTellerStack.top().name << " was removed\n";
             b.workingTellerStack.pop();
-            //}
         }
     }
 
@@ -242,7 +233,7 @@ int main ()
             
             b.mainTellerStack[j].freeTime = i + tmpTransTime;
             
-            cout << "Customer " << b.customersWaiting[0].fName << " " << b.customersWaiting[0].lName << " Attended by " << b.mainTellerStack[j].name << "\n";
+            cout << "Customer " << b.customersWaiting[0].firstName << " " << b.customersWaiting[0].lastName << " Attended by " << b.mainTellerStack[j].name << "\n";
             
             switch(tmpTransaction) {
               case 1:
@@ -270,7 +261,7 @@ int main ()
             
             cout << "\tWill finish on " << calcTime(b.mainTellerStack[j].freeTime) << "\n";
             
-            Transaction tmpTransaction(b.customersWaiting[0].fName, b.customersWaiting[0].lName, tmpTransType, calcTime(b.mainTellerStack[j].freeTime), amountTrans, b.mainTellerStack[j].freeTime);
+            Transaction tmpTransaction(b.customersWaiting[0].firstName, b.customersWaiting[0].lastName, tmpTransType, calcTime(b.mainTellerStack[j].freeTime), amountTrans, b.mainTellerStack[j].freeTime);
             b.transactionList.push_back(tmpTransaction);
             b.customersWaiting.pop_front();
             amountTrans = 0;
